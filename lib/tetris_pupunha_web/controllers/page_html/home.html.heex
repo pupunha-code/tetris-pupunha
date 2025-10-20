@@ -5,12 +5,12 @@
   <div class="flex items-center gap-8">
     <!-- Game Canvas -->
     <div class="relative">
-      <canvas id="tetris" class="border border-gray-700 rounded-lg shadow-lg" width="400" height="800"></canvas>
+      <canvas id="tetris" class="border border-gray-700 rounded-lg shadow-lg" width="700" height="800"></canvas>
       <button id="start-button" onclick="window.startTetrisGame && window.startTetrisGame()" class="absolute inset-0 m-auto w-32 h-16 bg-cyan-500 hover:bg-cyan-400 text-black font-bold text-lg rounded-lg shadow-lg transition-colors">
         INICIAR
       </button>
     </div>
-    
+
     <!-- Controls Panel -->
     <div class="bg-gray-800/50 backdrop-blur-sm rounded-lg p-4 border border-gray-700 w-72">
       <h3 class="text-cyan-400 font-semibold mb-3 text-center">🎮 CONTROLES</h3>
@@ -46,4 +46,36 @@
       </div>
     </div>
   </div>
+
+  <!-- Game Over Overlay -->
+  <div id="game-over" class="hidden fixed inset-0 w-screen h-screen bg-black/85 backdrop-blur-md flex items-center justify-center z-[1000] animate-fadeIn">
+    <div class="bg-gradient-to-br from-[#1a1a1a] to-[#2d1b1b] border-[3px] border-[#ff4444] rounded-[20px] p-10 text-center shadow-[0_20px_60px_rgba(255,68,68,0.3)] max-w-[500px] w-[90%] animate-pulse-shadow">
+      <h2 class="text-5xl font-bold text-[#ff4444] mb-4 drop-shadow-[2px_2px_4px_rgba(0,0,0,0.8)] font-mono">💀 GAME OVER 💀</h2>
+      <div class="text-xl text-[#ffaa44] mb-8 italic">Pupunha foi derrotada!</div>
+      <div class="text-base text-white leading-relaxed">
+        <div class="my-2.5 py-2">🔄 Pressione <kbd class="bg-[#333] border-2 border-[#555] rounded-md px-2 py-1 font-mono font-bold text-[#00ff88] mx-1 shadow-[0_2px_4px_rgba(0,0,0,0.3)]">R</kbd> para reiniciar</div>
+        <div class="my-2.5 py-2">⏸️ Pressione <kbd class="bg-[#333] border-2 border-[#555] rounded-md px-2 py-1 font-mono font-bold text-[#00ff88] mx-1 shadow-[0_2px_4px_rgba(0,0,0,0.3)]">P</kbd> para pausar</div>
+      </div>
+    </div>
+  </div>
 </div>
+
+<style>
+  @keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  @keyframes pulseShadow {
+    0%, 100% { box-shadow: 0 20px 60px rgba(255, 68, 68, 0.3); }
+    50% { box-shadow: 0 20px 80px rgba(255, 68, 68, 0.5); }
+  }
+
+  .animate-fadeIn {
+    animation: fadeIn 0.3s ease-out;
+  }
+
+  .animate-pulse-shadow {
+    animation: pulseShadow 2s infinite;
+  }
+</style>

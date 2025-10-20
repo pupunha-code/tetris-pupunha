@@ -5,13 +5,14 @@ import { collide } from "../core/collision.js"
 export function drawBoard(ctx, board, scale = 30) {
   const width = board[0].length * scale
   const height = board.length * scale
+  const offsetX = ctx.boardOffsetX || 0
 
-  const gradient = ctx.createLinearGradient(0, 0, 0, height)
+  const gradient = ctx.createLinearGradient(offsetX, 0, offsetX, height)
   gradient.addColorStop(0, "#1e1e1e")
   gradient.addColorStop(0.5, "#141414")
   gradient.addColorStop(1, "#0a0a0a")
   ctx.fillStyle = gradient
-  ctx.fillRect(0, 0, width, height)
+  ctx.fillRect(offsetX, 0, width, height)
 
   ctx.strokeStyle = "#333"
   ctx.lineWidth = 0.5
@@ -19,14 +20,14 @@ export function drawBoard(ctx, board, scale = 30) {
 
   for (let x = 0; x <= board[0].length; x++) {
     ctx.beginPath()
-    ctx.moveTo(x * scale + 0.5, 0)
-    ctx.lineTo(x * scale + 0.5, height)
+    ctx.moveTo(offsetX + x * scale + 0.5, 0)
+    ctx.lineTo(offsetX + x * scale + 0.5, height)
     ctx.stroke()
   }
   for (let y = 0; y <= board.length; y++) {
     ctx.beginPath()
-    ctx.moveTo(0, y * scale + 0.5)
-    ctx.lineTo(width, y * scale + 0.5)
+    ctx.moveTo(offsetX, y * scale + 0.5)
+    ctx.lineTo(offsetX + width, y * scale + 0.5)
     ctx.stroke()
   }
 
@@ -36,7 +37,7 @@ export function drawBoard(ctx, board, scale = 30) {
     row.forEach((cell, x) => {
       if (cell) {
         const color = typeof cell === 'string' ? cell : "#05f5fc"
-        drawBlock(ctx, x, y, scale, color)
+        drawBlock(ctx, x, y, scale, color, offsetX)
       }
     })
   )
@@ -44,13 +45,14 @@ export function drawBoard(ctx, board, scale = 30) {
 
 export function drawPiece(ctx, piece, scale = 30, color = null) {
   const pieceColor = color || piece.color || "#05f5fc"
+  const offsetX = ctx.boardOffsetX || 0
 
   const renderX = piece.renderX !== undefined ? piece.renderX : piece.x
   const renderY = piece.renderY !== undefined ? piece.renderY : piece.y
 
   if (piece.rotationProgress > 0) {
     ctx.save()
-    const centerX = (renderX + piece.shape[0].length / 2) * scale
+    const centerX = offsetX + (renderX + piece.shape[0].length / 2) * scale
     const centerY = (renderY + piece.shape.length / 2) * scale
 
     ctx.translate(centerX, centerY)
@@ -61,7 +63,7 @@ export function drawPiece(ctx, piece, scale = 30, color = null) {
   piece.shape.forEach((row, dy) =>
     row.forEach((cell, dx) => {
       if (cell) {
-        drawBlock(ctx, renderX + dx, renderY + dy, scale, pieceColor)
+        drawBlock(ctx, renderX + dx, renderY + dy, scale, pieceColor, offsetX)
       }
     })
   )
@@ -73,6 +75,7 @@ export function drawPiece(ctx, piece, scale = 30, color = null) {
 
 export function drawGhost(ctx, piece, board, scale = 30) {
   const ghost = { ...piece, y: piece.y }
+  const offsetX = ctx.boardOffsetX || 0
 
   while (!collide(board, ghost)) {
     ghost.y++
@@ -82,14 +85,14 @@ export function drawGhost(ctx, piece, board, scale = 30) {
   ghost.shape.forEach((row, dy) =>
     row.forEach((cell, dx) => {
       if (cell) {
-        drawBlock(ctx, ghost.x + dx, ghost.y + dy, scale, "rgba(255,255,255,0.15)")
+        drawBlock(ctx, ghost.x + dx, ghost.y + dy, scale, "rgba(255,255,255,0.15)", offsetX)
       }
     })
   )
 }
 
-function drawBlock(ctx, x, y, scale, color) {
-  const px = x * scale
+function drawBlock(ctx, x, y, scale, color, offsetX = 0) {
+  const px = offsetX + x * scale
   const py = y * scale
   const size = scale - 2
 
