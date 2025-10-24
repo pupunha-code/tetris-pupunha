@@ -1,195 +1,89 @@
 # Tetris Pupunha 🟦🟧🟩
 
-Uma recriação do **Tetris 99** desenvolvida com Phoenix LiveView e Elixir. Um battle royale de Tetris online onde 99 jogadores competem simultaneamente até sobrar apenas um vencedor, demonstrando o poder da programação funcional reativa em jogos multiplayer em tempo real.
+An online Tetris battle royale where 99 players compete until only one remains, built with Elixir and Phoenix to showcase the power of functional, real-time programming for multiplayer games.
 
-## Funcionalidades do Tetris 99
+## ✨ Features
 
-### Mecânicas Principais
+- **Battle Royale:** 99 players compete in a last-player-standing match.
+- **Multiplayer Attacks:** Send "garbage" lines to opponents by clearing multiple lines at once.
+- **Targeting System:** Manually aim at specific players or use automatic strategies (Random, Attackers, Badges, KOs).
+- **Real-time & Low Latency:** Optimized for responsive, instantly synchronized gameplay.
 
-- **Battle Royale:** 99 jogadores competem até sobrar apenas um
-- **Ataque Multiplayer:** Envie linhas de "lixo" para outros jogadores ao completar múltiplas linhas
-- **Sistema de Targeting:** Mire em jogadores específicos ou use estratégias automáticas
-- **Badges:** Sistema de conquistas que amplificam o poder de ataque
-- **Espectador:** Observe outros jogadores após ser eliminado
+## 🛠️ Tech Stack
 
-### Funcionalidades Técnicas
+- **Elixir** (~> 1.15) - A functional language perfect for concurrent systems.
+- **Phoenix** (~> 1.7) - A robust web framework for real-time applications.
+- **Phoenix LiveView** - For reactive, real-time user interfaces.
+- **Phoenix PubSub** - Messaging system for player communication.
+- **Ecto** - For data persistence.
+- **SQLite3** - Lightweight database for easy setup.
+- **Tailwind CSS** - For a modern, responsive UI.
 
-- **Tempo Real:** Sincronização instantânea entre todos os jogadores
-- **Baixa Latência:** Otimizado para jogabilidade responsiva
-- **Escalabilidade:** Suporte para múltiplas salas simultâneas
-- **Persistência:** Ranking e estatísticas de jogadores
+## 📋 Prerequisites
 
-### Modos de Targeting
+- **Elixir & Erlang:** [Official Installation Guide](https://elixir-lang.org/install.html)
+  - We recommend using a version manager like [asdf-vm](https://asdf-vm.com/) for development.
+- **Node.js:** Required for asset compilation. [Download here](https://nodejs.org/).
 
-- **Random:** Ataque jogadores aleatórios
-- **Attackers:** Contra-ataque quem está te atacando
-- **Badges:** Mire em jogadores com mais badges
-- **KOs:** Foque em eliminar jogadores vulneráveis
+---
 
-## 📋 Pré-requisitos
+## 🚀 Getting Started
 
-Antes de começar, você precisará ter instalado em sua máquina:
-
-### 1. Elixir e Erlang
-
-#### Ubuntu/Debian
-
-```bash
-# Adicione o repositório oficial do Erlang Solutions
-wget https://packages.erlang-solutions.com/erlang-solutions_2.0_all.deb
-sudo dpkg -i erlang-solutions_2.0_all.deb
-sudo apt-get update
-
-# Instale Erlang e Elixir
-sudo apt-get install esl-erlang elixir
-```
-
-#### macOS (via Homebrew)
-
-```bash
-brew install elixir
-```
-
-#### Windows
-
-1. Baixe o instalador do Elixir de: https://elixir-lang.org/install.html#windows
-2. Execute o instalador e siga as instruções
-
-#### Arch Linux
-
-```bash
-sudo pacman -S elixir
-```
-
-#### Via asdf (recomendado para desenvolvimento)
-
-```bash
-# Instale asdf
-git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.14.0
-
-# Adicione ao seu shell (bash/zsh)
-echo '. ~/.asdf/asdf.sh' >> ~/.bashrc
-echo '. ~/.asdf/completions/asdf.bash' >> ~/.bashrc
-
-# Reinicie o terminal e instale os plugins
-asdf plugin add erlang
-asdf plugin add elixir
-
-# Instale as versões
-asdf install erlang 26.2.5
-asdf install elixir 1.15.7-otp-26
-asdf global erlang 26.2.5
-asdf global elixir 1.15.7-otp-26
-```
-
-### 2. Node.js (para assets)
-
-```bash
-# Ubuntu/Debian
-sudo apt-get install nodejs npm
-
-# macOS
-brew install node
-
-# Arch Linux
-sudo pacman -S nodejs npm
-```
-
-### 3. PostgreSQL (banco de dados)
-
-```bash
-# Ubuntu/Debian
-sudo apt-get install postgresql postgresql-contrib
-
-# macOS
-brew install postgresql
-brew services start postgresql
-
-# Arch Linux
-sudo pacman -S postgresql
-sudo systemctl enable --now postgresql
-```
-
-## 🚀 Instalação e Configuração
-
-### 1. Clone o repositório
-
+### 1. Clone the Repository
 ```bash
 git clone https://github.com/pupunha-code/tetris-pupunha.git
 cd tetris-pupunha
 ```
 
-### 2. Instale as dependências
-
+### 2. Install Dependencies
+This single command fetches all Elixir and Node.js dependencies.
 ```bash
 mix deps.get
 ```
 
-### 3. Configure o banco de dados
-
+### 3. Set Up the Database
+This creates and seeds the database.
 ```bash
-# Crie e configure o banco de dados
 mix ecto.setup
 ```
 
-### 4. Instale e compile os assets (CSS/JS)
-
+### 4. Run the Server
+Start the Phoenix server.
 ```bash
-mix assets.setup
-mix assets.build
-```
-
-## 🎮 Como Executar
-
-### Modo Desenvolvimento
-
-```bash
-# Inicia o servidor Phoenix em modo desenvolvimento
 mix phx.server
 ```
-
-Ou se preferir executar dentro do IEx (Interactive Elixir):
-
+Or, to run inside an interactive Elixir shell:
 ```bash
 iex -S mix phx.server
 ```
+The application will be running at [http://localhost:4000](http://localhost:4000).
 
-O servidor estará disponível em [`localhost:4000`](http://localhost:4000)
+---
 
-### Comandos Úteis
+## 🎮 Development
 
-```bash
-# Executar testes
-mix test
+- **Run Tests:**
+  ```bash
+  mix test
+  ```
+- **Reset the Database:**
+  ```bash
+  mix ecto.reset
+  ```
+- **Deploy Assets for Production:**
+  ```bash
+  mix assets.deploy
+  ```
 
-# Verificar qualidade do código (linting, formatação, testes)
-mix precommit
+## 📡 Game Protocol
 
-# Resetar o banco de dados
-mix ecto.reset
+All real-time communication between the client and server follows a specific WebSocket protocol. For details on the implementation and how to interact with the game channels, please see the [**Game Protocol Document**](docs/protocol.md).
 
-# Compilar assets para produção
-mix assets.deploy
-```
+## 🎯 Current Mechanics Demo
 
-## 🎯 Demonstração da Mecânica Atual
-
-Confira o vídeo demonstrando a mecânica atual do jogo Tetris 99:
+The video below demonstrates the current state of the game's core mechanics, including piece movement, rotation, and line clearing. Multiplayer features are under active development.
 
 <video width="100%" controls>
   <source src="docs/mecanica-tetris.mp4" type="video/mp4">
-  Seu navegador não suporta a tag de vídeo. <a href="docs/mecanica-tetris.mp4">Clique aqui para baixar o vídeo</a>.
+  Your browser does not support the video tag. <a href="docs/mecanica-tetris.mp4">Click here to download the video</a>.
 </video>
-
-> **Nota:** O vídeo mostra as funcionalidades básicas do Tetris implementadas até o momento, incluindo movimento das peças, rotação e detecção de linhas completas. As funcionalidades multiplayer e battle royale estão em desenvolvimento.
-
-## 🛠️ Tecnologias Utilizadas
-
-- **Elixir** (~> 1.15) - Linguagem de programação funcional, ideal para sistemas concorrentes
-- **Phoenix** (~> 1.8.1) - Framework web robusto para aplicações em tempo real
-- **Phoenix LiveView** (~> 1.1.0) - Interface reativa para jogos multiplayer em tempo real
-- **Phoenix PubSub** - Sistema de mensageria para comunicação entre jogadores
-- **Ecto** - ORM para persistência de dados de jogadores e partidas
-- **SQLite3** - Banco de dados leve para desenvolvimento
-- **Tailwind CSS** - Framework CSS utilitário para UI responsiva
-- **Heroicons** - Ícones SVG moderno

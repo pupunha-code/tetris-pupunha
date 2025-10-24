@@ -1,8 +1,16 @@
-# Game protocol WIP
+# Game Protocol
 
-A user first needs to join the game room and look for a game.
+A user first joins the lobby to find a game. Once a game is found, they join a separate, dedicated channel for that game.
 
-1. Join game room in /socket
+---
+
+### 1. Matchmaking Flow
+
+The `game_room:lobby` channel is used exclusively for matchmaking.
+
+**1.1. Client joins the lobby**
+The client connects to the socket and joins the lobby channel.
+
 ```json
 {
   "topic": "game_room:lobby",
@@ -12,81 +20,96 @@ A user first needs to join the game room and look for a game.
 }
 ```
 
-2. Send looking for game in game room
+**1.2. Client requests a game**
+The client tells the server it's looking for a game.
+
 ```json
 {
   "topic": "game_room:lobby",
-  "event": "looking_for_game",
+  "event": "find_match",
   "payload": {},
   "ref": "2"
 }
 ```
 
-3. Receive game room id when game ready
+**1.3. Server finds a match and notifies clients**
+Once the server finds opponents, it creates a unique game channel and sends the topic to the matched players. This is a server push, so it has no `ref`.
+
 ```json
 {
-  "topic": "game_room:lobby",
-  "event": "game_ready",
+  "topic": "player:user-id-123",
+  "event": "match_found",
   "payload": {
-    "game_room_id": "123"
+    "game_topic": "game:bf2-d0-8a-9c"
   },
+  "ref": null
+}
+```
+
+---
+
+### 2. Gameplay Flow
+
+The client leaves the lobby channel and joins the dedicated game channel (e.g., `game:bf2-d0-8a-9c`). All in-game communication happens here.
+
+**2.1. Client joins the game channel**
+
+```json
+{
+  "topic": "game:bf2-d0-8a-9c",
+  "event": "phx_join",
+  "payload": {},
   "ref": "3"
 }
 ```
 
-4. Send enter game room with id
+**2.2. Server broadcasts game state**
+The game runs at a fixed tick rate (e.g., 10 TPS). On every tick, the server broadcasts the complete game state to all players in the channel.
+
 ```json
 {
-  "topic": "game_room:lobby",
-  "event": "enter_game_room",
+  "topic": "game:bf2-d0-8a-9c",
+  "event": "game_state",
   "payload": {
-    "game_room_id": "123"
+    "players": [
+      { "id": "player1", "board": "[...]", "score": 1200, "stance": "attack" },
+      { "id": "player2", "board": "[...]", "score": 1100, "stance": "defense" }
+    ],
+    "game_over": false
   },
+  "ref": null
+}
+```
+
+**2.3. Client sends player actions**
+Instead of a generic `player_payload` event, we use specific events for each action.
+
+**Move a piece:**
+```json
+{
+  "topic": "game:bf2-d0-8a-9c",
+  "event": "move",
+  "payload": { "direction": "left" },
   "ref": "4"
 }
 ```
 
-5. Send ready to play in game room
+**Rotate a piece:**
 ```json
 {
-  "topic": "game_room:lobby",
-  "event": "ready_to_play",
-  "payload": {},
+  "topic": "game:bf2-d0-8a-9c",
+  "event": "rotate",
+  "payload": { "direction": "clockwise" },
   "ref": "5"
 }
 ```
 
-Tetris Game loop
-
-Game runs in ~10 TPS every tick broadcasts the game state to all players, then JS renders the game state to the screen.
-Player sends payloads every tick
-
-1. Player payload
-Send
+**Change stance:**
 ```json
 {
-  "topic": "game_room:lobby",
-  "event": "player_payload",
-  "payload": {
-    "payload": {
-      "command": "move", // move, rotate, drop, change_stance...
-      "direction": "left"
-    }
-  },
+  "topic": "game:bf2-d0-8a-9c",
+  "event": "change_stance",
+  "payload": { "stance": "attack_mvp" },
   "ref": "6"
-}
-```
-
-Player can also change it's stance: Attack, Attack MVP, Defense
-Send
-```json
-{
-  "topic": "game_room:lobby",
-  "event": "player_payload",
-  "payload": {
-    "command": "change_stance",
-    "stance": "attack"
-  },
-  "ref": "7"
 }
 ```

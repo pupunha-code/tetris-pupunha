@@ -12,9 +12,7 @@ defmodule TetrisPupunha.Application do
       TetrisPupunha.Repo,
       {DNSCluster, query: Application.get_env(:tetris_pupunha, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: TetrisPupunha.PubSub},
-      # Start a worker by calling: TetrisPupunha.Worker.start_link(arg)
-      # {TetrisPupunha.Worker, arg},
-      # Start to serve requests, typically the last entry
+      TetrisPupunha.Matchmaking,
       TetrisPupunhaWeb.Endpoint
     ]
 

@@ -1,13 +1,13 @@
 defmodule TetrisPupunhaWeb.GameRoomChannel do
   use Phoenix.Channel
+  alias TetrisPupunha.Matchmaking
 
-  def join("room:" <> _room_id, _playload, socket) do
+  def join("game_room:lobby", _payload, socket) do
     {:ok, socket}
   end
 
-  # handle_in eh um sub no event "new_message"
-  def handle_in("new_message", %{"body" => body}, socket) do
-    broadcast!(socket, "new_message", %{body: body})
+  def handle_in("find_match", _payload, socket) do
+    Matchmaking.find_match(socket.assigns.user_id)
     {:noreply, socket}
   end
 end
