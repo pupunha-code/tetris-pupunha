@@ -61,7 +61,7 @@ class AudioSystem {
 
   playMusic() {
     if (!this.musicEnabled || !this.currentMusic) return;
-    
+
     this.currentMusic.play().catch(e => console.log('Music play failed:', e));
   }
 
@@ -76,6 +76,16 @@ class AudioSystem {
       this.currentMusic.pause();
       this.currentMusic.currentTime = 0;
     }
+  }
+
+  setMusicSpeed(speed) {
+    if (this.currentMusic) {
+      this.currentMusic.playbackRate = speed;
+    }
+    // Set playback rate for all tracks in the playlist
+    this.musicPlaylist.forEach(music => {
+      music.playbackRate = speed;
+    });
   }
 
   toggleMusic() {

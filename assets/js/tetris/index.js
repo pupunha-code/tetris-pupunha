@@ -8,6 +8,7 @@ import { createCanvas } from "./ui/canvas.js";
 import { updateHUD } from "./ui/hud.js";
 import { audioSystem } from "./systems/audio.js";
 import { animationSystem } from "./systems/animation.js";
+import { gameSocket } from "./systems/game_socket.js";
 
 const ctx = createCanvas();
 let board = createBoard();
@@ -16,6 +17,17 @@ let score = 0;
 let paused = false;
 let gameStarted = false;
 let gameOver = false;
+
+// Setup game socket callbacks
+gameSocket.onMatchFound = (payload) => {
+  console.log('[Tetris] Match found! Joining game:', payload.game_topic);
+};
+
+gameSocket.onGameState = (payload) => {
+  console.log('[Tetris] Game state received:', payload);
+  // Here you can update the game state based on server data if needed
+  // For now, we're just logging it
+};
 
 let holdPiece = null;
 let canHold = true;
@@ -63,6 +75,7 @@ function drop() {
     }
     score = updateScore(score, cleared);
     updateHUD(score);
+    updateGameSpeed();
     spawnNewPiece();
   } else {
     // Peça cair automaticamente
@@ -81,6 +94,7 @@ function hardDrop() {
   }
   score = updateScore(score, cleared);
   updateHUD(score);
+  updateGameSpeed();
   spawnNewPiece();
 }
 
@@ -101,6 +115,20 @@ function holdCurrentPiece() {
   canHold = false;
 }
 
+function updateGameSpeed() {
+  // Acelera o jogo a cada 1000 pontos
+  // A velocidade aumenta de forma progressiva até um máximo
+  const speedLevel = Math.floor(score / 1000);
+  const speedMultiplier = Math.min(1 + (speedLevel * 0.15), 4);
+
+  // Reduz o intervalo de queda (mais rápido)
+  dropInterval = Math.max(MIN_DROP_INTERVAL, BASE_DROP_INTERVAL / speedMultiplier);
+
+  // Aumenta a velocidade da música (até 2x)
+  const musicSpeed = Math.min(BASE_MUSIC_SPEED + (speedLevel * 0.1), MAX_MUSIC_SPEED);
+  audioSystem.setMusicSpeed(musicSpeed);
+}
+
 function resetGame() {
   board = createBoard();
   piece = nextQueue.shift();
@@ -113,6 +141,10 @@ function resetGame() {
   paused = false;
   holdPiece = null;
   canHold = true;
+
+  // Reset game speed
+  dropInterval = BASE_DROP_INTERVAL;
+  audioSystem.setMusicSpeed(BASE_MUSIC_SPEED);
 
   while (nextQueue.length < QUEUE_SIZE) {
     nextQueue.push(randomPiece());
@@ -132,6 +164,11 @@ function startGame() {
   resetGame();
   audioSystem.playMusic();
 
+  // Connect to game socket and find match
+  if (!gameSocket.isConnected()) {
+    gameSocket.connect();
+  }
+  gameSocket.findMatch();
 }
 
 // Make function available globally as backup
@@ -176,6 +213,8 @@ registerControls({
     } else {
       // Animação super rápida e não-bloqueante
       animationSystem.animateMovement(piece, oldX, piece.x, 40);
+      // Send move to server
+      gameSocket.sendMove('left');
     }
   },
   right: () => {
@@ -189,12 +228,30 @@ registerControls({
     } else {
       // Animação super rápida e não-bloqueante
       animationSystem.animateMovement(piece, oldX, piece.x, 40);
+      // Send move to server
+      gameSocket.sendMove('right');
     }
   },
-  down: () => drop(),
-  up: () => hardDrop(),
-  rotateRight: () => tryRotate('right'),
-  rotateLeft: () => tryRotate('left'),
+  down: () => {
+    drop();
+    // Send move to server
+    gameSocket.sendMove('down');
+  },
+  up: () => {
+    hardDrop();
+    // Send hard drop to server
+    gameSocket.sendHardDrop();
+  },
+  rotateRight: () => {
+    tryRotate('right');
+    // Send rotate to server
+    gameSocket.sendRotate('clockwise');
+  },
+  rotateLeft: () => {
+    tryRotate('left');
+    // Send rotate to server
+    gameSocket.sendRotate('counterclockwise');
+  },
   pause: () => {
     paused = !paused;
     if (paused) {
@@ -219,16 +276,18 @@ function update() {
     drawGhost(ctx, piece, board, ctx.scale)
     drawPiece(ctx, piece, ctx.scale)
 
-    // Hold piece on the left (before board offset)
     drawHoldPiece(ctx, holdPiece, canHold, 10, 50)
-    // Next queue on the right (after board + board width)
     const boardEndX = ctx.boardOffsetX + (10 * ctx.scale)
     drawNextQueue(ctx, nextQueue, boardEndX + 10, 50)
   }
 }
 
 let lastDropTime = 0;
-const dropInterval = 500;
+let dropInterval = 500;
+const BASE_DROP_INTERVAL = 500;
+const MIN_DROP_INTERVAL = 100;
+const BASE_MUSIC_SPEED = 1.0;
+const MAX_MUSIC_SPEED = 2.0;
 
 function gameUpdate(currentTime) {
   if (gameStarted && !paused && !gameOver && !animationSystem.hasActiveAnimations()) {
