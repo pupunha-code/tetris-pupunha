@@ -105,13 +105,13 @@ class AudioSystem {
 export const audioSystem = new AudioSystem();
 
 // Load sound effects - using actual files from static directory
-audioSystem.loadSound('blockFix', '/assets/js/tetris/sound-effect/block-fit.mp3');
-audioSystem.loadSound('scored', '/assets/js/tetris/sound-effect/scored.mp3');
-audioSystem.loadSound('gameOver', '/assets/js/tetris/sound-effect/its-over-pro-beta.mp3');
+audioSystem.loadSound('blockFix', '/assets/audio/sound-effect/block-fit.mp3');
+audioSystem.loadSound('scored', '/assets/audio/sound-effect/scored.mp3');
+audioSystem.loadSound('gameOver', '/assets/audio/sound-effect/its-over-pro-beta.mp3');
 
 // Load background music playlist - using actual files from static directory
 audioSystem.loadMusicPlaylist([
-  '/assets/js/tetris/playlist/1.mp3',
-  '/assets/js/tetris/playlist/2.mp3',
-  '/assets/js/tetris/playlist/3.mp3'
+  '/assets/audio/playlist/1.mp3',
+  '/assets/audio/playlist/2.mp3',
+  '/assets/audio/playlist/3.mp3'
 ]);
