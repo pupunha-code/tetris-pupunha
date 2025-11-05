@@ -47,7 +47,13 @@ This creates and seeds the database.
 mix ecto.setup
 ```
 
-### 4. Run the Server
+### 4. Build Assets
+Compile the frontend assets (Tailwind CSS and JavaScript).
+```bash
+mix assets.build
+```
+
+### 5. Run the Server
 Start the Phoenix server.
 ```bash
 mix phx.server

@@ -82,10 +82,11 @@ defmodule TetrisPupunha.MixProject do
       "ecto.reset": ["ecto.drop", "ecto.setup"],
       test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
       "assets.setup": ["tailwind.install --if-missing", "esbuild.install --if-missing"],
-      "assets.build": ["compile", "tailwind tetris_pupunha", "esbuild tetris_pupunha"],
+      "assets.build": ["compile", "tailwind tetris_pupunha", "esbuild tetris_pupunha", "copy_audio"],
       "assets.deploy": [
         "tailwind tetris_pupunha --minify",
         "esbuild tetris_pupunha --minify",
+        "copy_audio",
         "phx.digest"
       ],
       precommit: ["compile --warning-as-errors", "deps.unlock --unused", "format", "test"]
